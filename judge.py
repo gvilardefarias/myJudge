@@ -1,6 +1,6 @@
 import os, filecmp
 
-results = {1:'success', 2:'file not found', 3:'error', 4:'timeout'}
+results = {1:'Success Run', 2:'File Not Found', 3:'Error', 4:'Timeout', False:'W.A'}
 
 fileName = 'codigo.cpp'
 language = 'cpp'
@@ -63,20 +63,19 @@ if result==1:
     files = os.listdir(folder)
 
     for i in files:
-        run(fileName, folder + '/' + i, timeout, language, i[:-4])
+        res1 = run(fileName, folder + '/' + i, timeout, language, i[:-4])
+        print results[res1] + ' ' + i
 
     folder = os.path.dirname(os.path.realpath(__file__)) + folderOutputs
     files = os.listdir(folder)
 
     acc = 0
     for i in files:
-        comp = compare(folder + '/' + i, i[:-4])
-        if comp!=2 and comp:
+        res2 = compare(folder + '/' + i, i[:-4])
+        if res2!=2 and res2:
             acc += 1
-        elif comp<5:
-        	print results[comp]
+            print 'Acc ' + i
+        else:
+            print results[res2] + ' ' + i
 
     print (str(acc) + '/' + str(len(files)))
-    
-#Gustavo Vilar
-#Julgador Simples
