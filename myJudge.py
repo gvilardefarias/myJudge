@@ -2,10 +2,10 @@ import os, filecmp
 
 results = {1:'success', 2:'file not found', 3:'error', 4:'timeout'}
 
-fileName = 'brute.py'
-language = 'py'
-testin = 'entrada.txt'
-outCorrect = 'saida.txt'
+fileName = 'codigo.cpp'
+language = 'cpp'
+folderInputs = '/inputs'
+folderOutputs = '/outputs'
 timeout = '1'
 
 def compileFile(fileName, language):
@@ -28,26 +28,17 @@ def compileFile(fileName, language):
     else:
         return 2
 
-def run(fileName, input, timeout, language):
+def run(fileName, input, timeout, language, name):
     if language == 'py':
-        terminal = 'python ' + fileName
-        name = fileName[:-3]
+        terminal = 'python ' + fileName        
     elif language == 'py3':
-        terminal = 'python3 ' + fileName
-        name = fileName[:-3]
+        terminal = 'python3 ' + fileName        
     elif language=='c':
-        terminal = './' + fileName[:-2]
-        name = fileName[:-2]
+        terminal = './' + fileName[:-2]        
     elif language=='cpp':
-        terminal = './' + fileName[:-4]
-        name = fileName[:-4]
+        terminal = './' + fileName[:-4]        
 
     r = os.system('timeout ' + timeout + ' ' + terminal + ' < ' + input + ' > out' + name + '.txt')
-
-    if language=='c':
-        os.remove('./' + fileName[:-2])
-    elif language=='cpp':
-        os.remove('./' + fileName[:-4])
 
     if r==1792:
         return 1
@@ -56,25 +47,34 @@ def run(fileName, input, timeout, language):
     else:
         return 3
 
-def compare(output):
-    if language == 'py':
-        name = fileName[:-3]
-    elif language == 'py3':
-        name = fileName[:-3]
-    elif language=='c':
-        name = fileName[:-2]
-    elif language=='cpp':
-        name = fileName[:-4]
-
+def compare(output, name):
     if os.path.isfile('out' + name + '.txt') and os.path.isfile(output):
         b = filecmp.cmp('out' + name + '.txt', output)
         return b
     else:
         return 2
 
-print(results[compileFile(fileName, language)])
-print (results[run(fileName, testin, timeout, language)])
-print (compare(outCorrect))
+result = compileFile(fileName, language)
+print(results[result])
 
+if result==1:
+
+    folder = os.path.dirname(os.path.realpath(__file__)) + folderInputs
+    files = os.listdir(folder)
+
+    for i in files:
+        run(fileName, folder + '/' + i, timeout, language, i[:-4])
+
+    folder = os.path.dirname(os.path.realpath(__file__)) + folderOutputs
+    files = os.listdir(folder)
+
+    acc = 0
+    for i in files:
+        comp = compare(folder + '/' + i, i[:-4])
+        if comp!=2 and comp:
+            acc += 1
+
+    print (str(acc) + '/' + str(len(files)))
+    
 #Gustavo Vilar
 #Julgador Simples
